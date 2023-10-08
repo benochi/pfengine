@@ -13,10 +13,10 @@ assembly="testbed"
 compilerFlags="-g -fdeclspec -fPIC"
 # -fms-extensions
 # -Wall Werror
-incluseFlags="-Isrc -I../engine/src/"
-linkerFlags="-L../bin/ -lengine -Wl, -rpath,."
+includeFlags="-Isrc -I../engine/src/"
+linkerFlags="-L../bin/ -lengine -Wl,-rpath,."
 defines="-D_DEBUG -DKIMPORT"
 
 echo "Build $assembly..."
 echo clang $cFilenames $compilerFlags -o ../bin/$assembly $defines $includeFlags $linkerFlags
-clang $cFilenames $compilerFlags -o ../bin/$assembly $defines $includesFlags $linkerFlags
+clang $cFilenames $compilerFlags -o ../bin/$assembly $defines $includeFlags $linkerFlags
