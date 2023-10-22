@@ -67,7 +67,7 @@ b8 platform_startup(
     RECT border_rect = {0, 0, 0, 0};
     AdjustWindowRectEx(&border_rect, window_style, 0, window_ex_style);
 
-    // In this case, the border rectanle is negative.
+    // In this case, the border rectangle is negative.
     window_x += border_rect.left;
     window_y += border_rect.top;
 
@@ -95,6 +95,62 @@ b8 platform_startup(
     // if initially minimized, use SW_MINIMIZE : SW_SHOWMINNOACTIVE;
     // if initially maximized, use SW_SHOWMAXIMIZED : SW_MAXIMIZE
     ShowWindow(state->hwnd, show_window_command_flags);
+
+    return TRUE;
+}
+
+void platform_shutdown(platform_state *plat_state) {
+    // simple cold-cast to the known type.
+    internal_state *state = (internal_state *)plat_state->internal_state;
+
+    if (state->hwnd) {
+        DestroyWindow(state->hwnd);
+        state->hwnd = 0;
+    }
+}
+
+b8 platform_pump_messages(platform_state *plat_state) {
+    MSG message;
+    while (PeekMessageA(&message, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&message);
+        DispatchMessage(&message);
+    }
+    return TRUE;
+}
+
+void *platform_allocate(u64 size, b8 aligned) {
+    return malloc(size);
+}
+
+void platform_free(void *block, u64 aligned) {
+    free(block);
+}
+
+void *platform_zero_memory(void *block, u64 size) {
+    return memset(block, 0, size);
+}
+
+void *platform_copy_memory(void *dest, const void *source, u64 size) {
+    return memcpy(dest, source, size);
+}
+
+void *platform_set_memory(void *dest, i32 value, u64 size) {
+    return memset(dest, value, size);
+}
+
+void platform_console_write(const char *message, u8 colour) {
+    HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    // FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+    static u8 levels[6] = {64, 4, 6, 2, 1, 8};
+    SetConsoleTextAttribute(console_handle, levels[colour]);
+
+    OutputDebugStringA(message);
+    u64 length = strlen(message);
+    LPDWORD number_written = 0;
+    WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), message, (DWORD)length, number_written, 0);
+}
+
+void platform_console_write_error(const char *message, u8 color) {
 }
 
 #endif
