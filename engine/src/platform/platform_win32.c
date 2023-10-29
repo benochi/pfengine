@@ -12,6 +12,9 @@ typedef struct internal_state {
     HWND hwnd;
 } internal_state;
 
+static f64 clock_frequency;
+static LARGE_INTEGER start_time;
+
 LRESULT CALLBACK win32_process_message(HWND hwnd, u32 msg, WPARAM w_param, LPARAM l_param);
 
 b8 platform_startup(
@@ -96,6 +99,12 @@ b8 platform_startup(
     // if initially maximized, use SW_SHOWMAXIMIZED : SW_MAXIMIZE
     ShowWindow(state->hwnd, show_window_command_flags);
 
+    // Clock setup
+    LARGE_INTEGER frequency;
+    QueryPerformanceFrequency(&frequency);
+    clock_frequency = 1.0 / (f64)frequency.QuadPart;
+    QueryPerformanceCounter(&start_time);
+
     return TRUE;
 }
 
@@ -150,7 +159,19 @@ void platform_console_write(const char *message, u8 colour) {
     WriteConsoleA(GetStdHandle(STD_OUTPUT_HANDLE), message, (DWORD)length, number_written, 0);
 }
 
-void platform_console_write_error(const char *message, u8 color) {
+void platform_console_write_error(const char *message, u8 colour) {
+    HANDLE console_handle = GetStdHandle(STD_ERROR_HANDLE);
+    // FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+    static u8 levels[6] = {64, 4, 6, 2, 1, 8};
+    SetConsoleTextAttribute(console_handle, levels[colour]);
+
+    OutputDebugStringA(message);
+    u64 length = strlen(message);
+    LPDWORD number_written = 0;
+    WriteConsoleA(GetStdHandle(STD_ERROR_HANDLE), message, (DWORD)length, number_written, 0);
+}
+
+f64 platform_get_absolute_time() {
 }
 
 #endif
