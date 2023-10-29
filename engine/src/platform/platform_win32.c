@@ -43,7 +43,7 @@ b8 platform_startup(
     wc.hbrBackground = NULL;
     wc.lpszClassName = "kohi_window_class";
 
-    if (!RegsiterClassA(&wc)) {
+    if (!RegisterClassA(&wc)) {
         MessageBox(0, "Window registration failed", "Error", MB_ICONEXCLAMATION | MB_OK);
         return FALSE;
     }
