@@ -49,8 +49,15 @@ b8 application_create(application_config* config) {
 }
 
 b8 application_run() {
-    while (TRUE) {
-        platform_pump_messages(&app_state.platform);
+    while (app_state.is_running) {
+        if (!platform_pump_messages(&app_state.platform)) {
+            app_state.is_running = FALSE;
+        };
     }
+
+    app_state.is_running = FALSE;
+
     platform_shutdown(&app_state.platform);
+
+    return TRUE;
 }
