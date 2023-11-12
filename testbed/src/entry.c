@@ -2,7 +2,7 @@
 
 #include <entry.h>
 
-#include <platform/platform.h>
+#include <core/kmemory.h>  
 
 b8 create_game(game* out_game) {
     // application config
@@ -16,8 +16,8 @@ b8 create_game(game* out_game) {
     out_game->initialize = game_initialize;
     out_game->on_resize = game_on_resize;
 
-    // Create the game state.
-    out_game->state = platform_allocate(sizeof(game_state), FALSE);
+    // Create the game state. void *kallocate(u64 size, memory_tag tag)
+    out_game->state = kallocate(sizeof(game_state), MEMORY_TAG_GAME);
 
     return TRUE;
 }
